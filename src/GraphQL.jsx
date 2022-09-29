@@ -2,11 +2,9 @@ import gql from "graphql-tag";
 import React from "react";
 import { Card } from "react-bootstrap";
 
-
-//returns 1 poll with relevant details
 const QUERY_GET_POLL = gql`
   query {
-    poll(limit: 1) {
+    poll(limit: 10) {
       id
       question
       options(order_by: { id: desc }) {
@@ -17,7 +15,6 @@ const QUERY_GET_POLL = gql`
   }
 `;
 
-//inserts a new vote to the database
 const MUTATION_VOTE = gql`
   mutation vote($optionId: uuid!, $userId: uuid!) {
     insert_vote(
@@ -30,7 +27,6 @@ const MUTATION_VOTE = gql`
   }
 `;
 
-//real-time data
 const SUBSCRIPTION_RESULT = gql`
   subscription getResult($pollId: uuid!) {
     poll_results(
@@ -47,7 +43,6 @@ const SUBSCRIPTION_RESULT = gql`
   }
 `;
 
-//display online users
 const SUBSCRIPTION_ONLINE_USERS = gql`
   subscription getOnlineUsersCount {
     online_users {
@@ -56,7 +51,6 @@ const SUBSCRIPTION_ONLINE_USERS = gql`
   }
 `;
 
-//show user is online
 const MUTATION_MARK_USER_ONLINE = gql`
   mutation userOnline($uuid: uuid) {
     update_user(where: { id: { _eq: $uuid } }, _set: { online_ping: true }) {
@@ -68,7 +62,6 @@ const MUTATION_MARK_USER_ONLINE = gql`
   }
 `;
 
-//create new user
 const MUTATION_NEW_USER = gql`
   mutation newUser($uuid: uuid) {
     insert_user(objects: [{ id: $uuid }]) {
@@ -79,3 +72,47 @@ const MUTATION_NEW_USER = gql`
     }
   }
 `;
+
+const GraphQLQueryList = () => (
+  <div className="container">
+    <div className="col-md-12 cardGraphQL">
+      <Card>
+        <Card.Header>
+          GraphQL Queries/Mutations/Subscriptions in this page
+        </Card.Header>
+        <Card.Body>
+          <div className="row">
+            <div className="col-md-4">
+              Get the Poll question and options:
+              <pre>{QUERY_GET_POLL.loc.source.body}</pre>
+              Create a new user:
+              <pre>{MUTATION_NEW_USER.loc.source.body}</pre>
+            </div>
+            <div className="col-md-4">
+              Cast a vote:
+              <pre>{MUTATION_VOTE.loc.source.body}</pre>
+              Mark user online:
+              <pre>{MUTATION_MARK_USER_ONLINE.loc.source.body}</pre>
+            </div>
+            <div className="col-md-4">
+              Show live results:
+              <pre>{SUBSCRIPTION_RESULT.loc.source.body}</pre>
+              Get real-time number of users:
+              <pre>{SUBSCRIPTION_ONLINE_USERS.loc.source.body}</pre>
+            </div>
+          </div>
+        </Card.Body>
+      </Card>
+    </div>
+  </div>
+);
+
+export {
+  GraphQLQueryList,
+  QUERY_GET_POLL,
+  MUTATION_VOTE,
+  SUBSCRIPTION_RESULT,
+  SUBSCRIPTION_ONLINE_USERS,
+  MUTATION_MARK_USER_ONLINE,
+  MUTATION_NEW_USER,
+};
